@@ -15,10 +15,10 @@ def first_solution(test_case: dict, t_displacement: dict[str:dict[str:int]],
     rand_but_not_visited = set()  # miejsca wylosowane ale nie spełniające warunków
 
     while available_time > ti and len(rand_but_not_visited) < len(test_case):
-        rand_elem = random.chice(test_case.keys())  # losujemy rozwiązanie
+        rand_elem = random.chice(test_case.keys())  # losowanie rozwiązanie
         if last_elem != 0:
             ti += t_displacement[last_elem][rand_elem]
-            # dodajemy do aktualnego czasu czas podróży (chyba że jest to pierwsze miejsce)
+            # dodanie do aktualnego czasu czas podróży (chyba że jest to pierwsze miejsce)
 
         # test_case: dict[key][x, y, t_otwarcia, t_zamkniecia, ps, t_maxPS]
 
@@ -36,35 +36,36 @@ def first_solution(test_case: dict, t_displacement: dict[str:dict[str:int]],
 
                 visited[rand_elem] = True
                 last_elem = rand_elem
-                rand_but_not_visited.clear()  # znalezlismy rozwiazanie, czyscimy zbior
+                rand_but_not_visited.clear()  # znaleziono rozwiazanie, czyszczenie zbioru
 
         else:
-            rand_but_not_visited.add(rand_elem)  # dodajemy rozwiazanie do zbioru
+            rand_but_not_visited.add(rand_elem)  # dodanie rozwiazanie do zbioru
 
     return [ans, alphas, ps]
 
-
-# TODO: funkcja next_solution(solution): dodawanie nowego elementu do rozwiązania
 
 def next_solution(test_case: dict, t_displacement: dict[str:dict[str:int]], solution: List[str], alphas: List[float],
                   ps: int, available_time: int) -> List[dict[str: float], int]:
 
     rand_but_not_visited = set()
 
-    first_elem = random.choice(solution)  # wylosowanie elementu rozwiązania
+    first_elem = random.choice(solution)  # wylosowanie elementu rozwiązania (który zostanie nadpisany)
     [ti, available_time] = subtract_first_elem_from_solution(solution, alphas, t_displacement,
                                                              test_case, first_elem, available_time)
 
     while len(rand_but_not_visited) < len(test_case):
-        second_elem = random.chice(test_case.keys())  # wylosowanie elementu dostępnych rozwiązań
+        second_elem = random.chice(test_case.keys())  # wylosowanie elementu spoza rozwiązania
 
         if second_elem not in solution and test_case[second_elem][2] < ti < test_case[second_elem][3]:
             alpha = random(0, 1)
 
             if available_time > alpha*test_case[second_elem][5]:
-                ########
+                solution.insert(solution.index(first_elem), second_elem)  # wpisanie second_elem na listę rozwiązań\
+                alphas.insert(solution.index(first_elem), alpha)          # w miejscu first_elem, to samo dla alpha
 
-                ########
+                ps -= alphas[solution.index(first_elem)] * test_case[first_elem][4]
+                ps += alpha * test_case[second_elem][4]
+                # odjęcie punktów satysfakcji dla miejsca first_elem oraz dodanie dla second_elem
 
                 rand_but_not_visited.clear()
         else:
