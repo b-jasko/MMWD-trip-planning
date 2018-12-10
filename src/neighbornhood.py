@@ -4,44 +4,42 @@ from typing import List
 # TODO: Zamienic typ t_displacement na zbiór set
 
 
-def first_solution(test_case: dict, t_displacement: List[List[int]],
+def first_solution(test_case: dict, t_displacement: dict[str:dict[str:int]],
                    available_time: int) -> [List[str], List[float], int]:  # -> List[dict['nazwa': alpha], PS]
     ti = 0  # aktualny czas
     ps = 0  # punkty satysfakcji
-    last_i = 0  # nr. miejsca odwiedzonego w poprzedniej iteracji
+    last_elem = 0  # miejsce odwiedzonego w poprzedniej iteracji
     ans = []  # rozwiazanie
     alphas = []  # współczynniki alfa
-    visited = {}  # miejsca juz odwiedzone {nr. miejsca[int]: czy byl odwiedzony[bool]}
+    visited = {}  # miejsca juz odwiedzone {miejsce[str]: czy byl odwiedzony[bool]}
     rand_but_not_visited = set()  # miejsca wylosowane ale nie spełniające warunków
 
-    get_key = lambda index: list(test_case.keys())[index]  # zwraca klucz
-
     while available_time > ti and len(rand_but_not_visited) < len(test_case):
-        i = randint(0, len(test_case))  # numer elementu rozwiązania
+        rand_elem = random.chice(test_case.keys())  # losujemy rozwiązanie
+        if last_elem != 0:
+            ti += t_displacement[last_elem][rand_elem]
+            # dodajemy do aktualnego czasu czas podróży (chyba że jest to pierwsze miejsce)
 
-        if last_i != 0:
-            ti += t_displacement[last_i][i]
+        # test_case: dict[key][x, y, t_otwarcia, t_zamkniecia, ps, t_maxPS]
 
-        # test_case: dict[get_key(i)][x, y, t_otwarcia, t_zamkniecia, ps, t_maxPS]
-
-        if i not in visited and test_case[get_key(i)][2] < ti < test_case[get_key(i)][3]:
+        if rand_elem not in visited and test_case[rand_elem][2] < ti < test_case[rand_elem][3]:
             # sprawdzenie funkcji dopuszczalnych
 
-            alpha = random(0, 1)
+            alpha = random(0, 1)  # współczynnik ilości czasu spędzonego w danym miejscu
 
-            if ti + test_case[get_key(i)][5] * alpha < available_time:
+            if ti + test_case[rand_elem][5] * alpha < available_time:
                 # sprawdzenie czy dane miejse zmiescimy w dostepnym czasie
 
-                ans[i] = get_key(i)
-                alphas[i] = alpha
-                ps += int(alpha * test_case[get_key(i)][4])
+                ans.append(rand_elem)
+                alphas.append(alpha)
+                ps += int(alpha * test_case[rand_elem][4])
 
-                visited[i] = True
-                last_i = i
+                visited[rand_elem] = True
+                last_elem = rand_elem
                 rand_but_not_visited.clear()  # znalezlismy rozwiazanie, czyscimy zbior
 
         else:
-            rand_but_not_visited.add(i)  # dodajemy rozwiazanie do zbioru
+            rand_but_not_visited.add(rand_elem)  # dodajemy rozwiazanie do zbioru
 
     return [ans, alphas, ps]
 
@@ -80,10 +78,11 @@ def subtract_first_elem_from_solution(solution: List[str], alphas: List[float], 
 
     used_time = 0  # wykorzystany czas
     ti = 0  # aktualny czas
+    last_elem: str = '0'
 
     for elem, alpha in solution, alphas:
         if elem == first_elem:
-            if last_elem:
+            if last_elem != '0':
                 used_time -= t_displacement[last_elem][elem]
                 last_elem = elem
                 ti = used_time
