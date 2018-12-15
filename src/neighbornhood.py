@@ -1,8 +1,6 @@
 from random import randint, random
 from typing import List
 
-# TODO: Zamienic typ t_displacement na zbiór set
-
 
 def first_solution(test_case: dict, t_displacement: dict[str:dict[str:int]],
                    available_time: int) -> [List[str], List[float], int]:  # -> List[dict['nazwa': alpha], PS]
@@ -15,20 +13,17 @@ def first_solution(test_case: dict, t_displacement: dict[str:dict[str:int]],
     rand_but_not_visited = set()  # miejsca wylosowane ale nie spełniające warunków
 
     while available_time > ti and len(rand_but_not_visited) < len(test_case):
-        rand_elem = random.chice(test_case.keys())  # losowanie rozwiązanie
+        rand_elem: str = random.chice(test_case.keys())  # losowanie rozwiązanie
+        alpha = random(0, 1)  # współczynnik ilości czasu spędzonego w danym miejscu
+
         if last_elem != 0:
             ti += t_displacement[last_elem][rand_elem]
             # dodanie do aktualnego czasu czas podróży (chyba że jest to pierwsze miejsce)
 
         # test_case: dict[key][x, y, t_otwarcia, t_zamkniecia, ps, t_maxPS]
 
-        if rand_elem not in visited and test_case[rand_elem][2] < ti < test_case[rand_elem][3]:
-            # sprawdzenie funkcji dopuszczalnych
-
-            alpha = random(0, 1)  # współczynnik ilości czasu spędzonego w danym miejscu
-
-            if ti + test_case[rand_elem][5] * alpha < available_time:
-                # sprawdzenie czy dane miejse zmiescimy w dostepnym czasie
+        if rand_elem not in visited and test_case[rand_elem][2] < ti < test_case[rand_elem][3]\
+                and ti + test_case[rand_elem][5] * alpha < available_time:  # sprawdzenie funkcji dopuszczalnych
 
                 ans.append(rand_elem)
                 alphas.append(alpha)
@@ -48,35 +43,46 @@ def next_solution(test_case: dict, t_displacement: dict[str:dict[str:int]], solu
                   ps: int, available_time: int) -> List[dict[str: float], int]:
 
     rand_but_not_visited = set()
+    rand_but_not_visited_sec = set()
 
-    first_elem = random.choice(solution)  # wylosowanie elementu rozwiązania (który zostanie nadpisany)
-    [ti, available_time] = subtract_first_elem_from_solution(solution, alphas, t_displacement,
-                                                             test_case, first_elem, available_time)
+    while len(rand_but_not_visited) < len(solution):
 
-    while len(rand_but_not_visited) < len(test_case):
-        second_elem = random.chice(test_case.keys())  # wylosowanie elementu spoza rozwiązania
+        first_elem = random.choice(solution)  # wylosowanie elementu rozwiązania (który zostanie nadpisany)
 
-        if second_elem not in solution and test_case[second_elem][2] < ti < test_case[second_elem][3]:
+        [ti, available_time] = subtract_first_elem_from_solution(solution, alphas, t_displacement,
+                                                                 test_case, first_elem, available_time)
+
+        while len(rand_but_not_visited_sec) < len(test_case):
+            second_elem = random.chice(test_case.keys())  # wylosowanie elementu spoza rozwiązania
             alpha = random(0, 1)
 
-            if available_time > alpha*test_case[second_elem][5]:
-                solution.insert(solution.index(first_elem), second_elem)  # wpisanie second_elem na listę rozwiązań\
-                alphas.insert(solution.index(first_elem), alpha)          # w miejscu first_elem, to samo dla alpha
+            if second_elem not in solution and test_case[second_elem][2] < ti < test_case[second_elem][3] \
+                    and available_time > alpha * test_case[second_elem][5]:
 
-                ps -= alphas[solution.index(first_elem)] * test_case[first_elem][4]
+                first_elem_index = solution.index(first_elem)  # zapisanie indeksu first_elem w solution
+
+                solution.remove(first_elem)
+                solution.insert(first_elem_index, second_elem)  # wpisanie second_elem na listę rozwiązań\
+
+                alphas.remove(alphas[first_elem_index])  # w miejscu first_elem
+                alphas.insert(first_elem_index, alpha)  # to samo dla alpha
+
+                ps -= alphas[first_elem_index] * test_case[first_elem][4]
                 ps += alpha * test_case[second_elem][4]
                 # odjęcie punktów satysfakcji dla miejsca first_elem oraz dodanie dla second_elem
 
-                rand_but_not_visited.clear()
-        else:
-            rand_but_not_visited = second_elem
+                return [solution, alphas, ps]  # podmienilismy rozwiazanie konczymy dzialanie funkcji
+            else:
+                rand_but_not_visited_sec = second_elem
+
+        rand_but_not_visited_sec.clear()
+        rand_but_not_visited = first_elem
 
     return [solution, alphas, ps]
 
 
 def subtract_first_elem_from_solution(solution: List[str], alphas: List[float], t_displacement: dict[str:dict[str:int]],
                                       test_case: dict, first_elem: str, available_time: int) -> [int, int]:
-
     used_time = 0  # wykorzystany czas
     ti = 0  # aktualny czas
     last_elem: str = '0'

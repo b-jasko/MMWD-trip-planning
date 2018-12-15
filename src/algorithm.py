@@ -4,7 +4,7 @@ from typing import List
 from src.neighbornhood import first_solution, next_solution
 
 
-def algorithm(test_case: dict, t_displacement: List[List[int]],
+def algorithm(test_case: dict, t_displacement: dict[str:dict[str:int]],
               available_time: int, t_max: int, t_min: int, len_of_sol: int) -> List[List[str], List[float], int]:
 
     [solution, alphas, energy] = first_solution(test_case, t_displacement, available_time)  # pierwsze rozwiązanie i
