@@ -1,32 +1,30 @@
 from math import exp
 from random import random
 from typing import List
-from src.neighbornhood import first_solution, next_solution
+from src.solution import Solution
 
 
 def algorithm(test_case: dict, t_displacement: dict[str:dict[str:int]],
               available_time: int, t_max: int, t_min: int, len_of_sol: int) -> List[List[str], List[float], int]:
 
-    [solution, alphas, energy] = first_solution(test_case, t_displacement, available_time)  # pierwsze rozwiązanie i
-    # jego punkty
-    solutions = []  # lista dobrych rozwiązań
+    solution = Solution(test_case, t_displacement, available_time)
+    current_solution = solution
+    best_solutions = []
 
-    for t in range(t_max, t_min):
-        [next_sol, alphas_next, energy_next] = next_solution(test_case, t_displacement, solution, alphas, energy,
-                                                             available_time)  # następne rozwiązanie i jego punkty
-        delta_e = energy_next - energy  # różnica w punktach pomiędzy rozwiązaniami
+    for temperature in range(t_max, t_min):
+        solution = current_solution
+        Solution.neighborhood_of_solution(solution)
+        next_solution = solution
 
-        if delta_e > 0:
-            solution = next_sol
-            alphas = alphas_next
-            energy = energy_next
-            solutions.append(solution, alphas, energy)
-        elif exp(delta_e / t) > random(0, 1):
-            energy = energy_next
-            alphas = alphas_next
-            solution = next_sol
+        difference_of_energy = next_solution.satisfaction_points - current_solution.satisfaction_points
 
-        if len(solutions) > len_of_sol:  # sprawdź czy lista nie jest przepełniona
-            del solutions[0]
+        if difference_of_energy > 0:
+            current_solution = next_solution
+            best_solutions.append(next_solution)
+        elif exp(difference_of_energy / temperature) > random(0, 1):
+            current_solution = next_solution
 
-    return solutions
+        if len(best_solutions) > len_of_sol:
+            del best_solutions[0]
+
+    return best_solutions
