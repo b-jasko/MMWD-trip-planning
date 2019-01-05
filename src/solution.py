@@ -1,9 +1,10 @@
+from math import sqrt
 from random import random
 from random import choice as random_choice
 
 
 class Solution:
-    def __init__(self, test_case: dict, t_displacement: dict[str:dict[str:int]], available_time: int):
+    def __init__(self, test_case: dict, t_displacement: dict, available_time: int):
         self.answer = []
         self.alphas = []
         self.satisfaction_points = 0
@@ -16,25 +17,26 @@ class Solution:
         visited_places = {}  # {miejsce[str]: czy byl odwiedzony[bool]}
         unacceptable_places = set()
 
-        while available_time > current_time and len(unacceptable_places) < len(test_case):
-            rand_place = random_choice(test_case.keys())
+        while self.all_available_time > current_time and len(unacceptable_places) < len(self.test_case):
+            rand_place = random_choice(list(self.test_case))
             alpha = random()  # współczynnik ilości czasu spędzonego w danym miejscu
 
             if last_place != 0:
-                current_time += t_displacement[last_place][rand_place]
+                current_time += self.t_displacement[last_place][rand_place]
                 # dodanie do aktualnego czasu czas podróży (chyba że jest to pierwsze miejsce)
 
             # test_case: dict[key][x, y, t_otwarcia, t_zamkniecia, ps, t_maxPS]
 
-            if rand_place not in visited_places and test_case[rand_place][2] < current_time < test_case[rand_place][3] \
-                    and current_time + test_case[rand_place][5] * alpha < available_time:
+            if rand_place not in visited_places \
+                    and self.test_case[rand_place][2] < current_time < self.test_case[rand_place][3] \
+                    and current_time + self.test_case[rand_place][5] * alpha < self.all_available_time:
                     # sprawdzenie funkcji dopuszczalnych
 
                 self.answer.append(rand_place)
                 self.alphas.append(alpha)
-                self.satisfaction_points += int(alpha * test_case[rand_place][4])
+                self.satisfaction_points += int(alpha * self.test_case[rand_place][4])
 
-                current_time += test_case[rand_place][5] * alpha
+                current_time += self.test_case[rand_place][5] * alpha
                 visited_places[rand_place] = True
                 last_place = rand_place
                 unacceptable_places.clear()  # znaleziono rozwiazanie, czyszczenie zbioru
@@ -103,3 +105,20 @@ class Solution:
             currently_available_time -= used_time
 
         return [current_time, currently_available_time]
+
+
+def count_t_displacement(test_case: dict, velocity: int) -> dict:
+    t_displacements = {}
+
+    for start in test_case:
+        temp_dict = {}
+        for finish in test_case:
+            if finish != start:
+                x_displacement = test_case[finish][0] - test_case[start][0]
+                y_displacement = test_case[finish][1] - test_case[start][1]
+                displacement = sqrt(pow(x_displacement, 2) + pow(y_displacement, 2))
+                t_displacement = displacement/velocity
+                temp_dict[finish] = t_displacement
+        t_displacements[start] = temp_dict
+
+    return t_displacements

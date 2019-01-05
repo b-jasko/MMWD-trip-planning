@@ -1,11 +1,14 @@
 from math import exp
 from random import random
 from typing import List
-from src.solution import Solution
+from src.solution import Solution, count_t_displacement
 
 
-def algorithm(test_case: dict, t_displacement: dict[str:dict[str:int]],
-              available_time: int, t_max: int, t_min: int, len_of_sol: int) -> List[List[str], List[float], int]:
+def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
+              t_min: int, len_of_sol: int) -> List[Solution]:
+
+    t_displacement = count_t_displacement(test_case, velocity)
+
     solution = Solution(test_case, t_displacement, available_time)
     current_solution = solution
     best_solutions = []
