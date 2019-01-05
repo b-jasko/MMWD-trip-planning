@@ -1,7 +1,10 @@
 from math import exp
 from random import random
 from typing import List
+
 from src.solution import Solution, count_t_displacement
+
+test_case = {'Kraków': (22, 15, 0, 100, 3, 13), 'Warszawa': (25, 20, 0, 100, 5, 15), 'Lublin': (27, 19, 0, 100, 2, 10)}
 
 
 def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
@@ -13,7 +16,7 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
     current_solution = solution
     best_solutions = []
 
-    for temperature in range(t_max, t_min):
+    for temperature in range(t_min, t_max):
         solution = current_solution
         if_not_exist = Solution.neighborhood_of_solution(solution)
         if if_not_exist == 1:
@@ -33,3 +36,6 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
             del best_solutions[0]
 
     return best_solutions
+
+
+print(algorithm(test_case, 0.5, 1000, 1500, 10, 10))

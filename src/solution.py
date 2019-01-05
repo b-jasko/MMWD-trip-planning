@@ -14,11 +14,12 @@ class Solution:
 
         current_time = 0
         last_place = 0
-        visited_places = {}  # {miejsce[str]: czy byl odwiedzony[bool]}
-        unacceptable_places = set()
+        places_to_rand = list(self.test_case)
 
-        while self.all_available_time > current_time and len(unacceptable_places) < len(self.test_case):
-            rand_place = random_choice(list(self.test_case))
+        while self.all_available_time > current_time and len(places_to_rand) > 0:
+            rand_place = random_choice(places_to_rand)
+            places_to_rand.remove(rand_place)
+
             alpha = random()  # współczynnik ilości czasu spędzonego w danym miejscu
 
             if last_place != 0:
@@ -26,10 +27,7 @@ class Solution:
                 # dodanie do aktualnego czasu czas podróży (chyba że jest to pierwsze miejsce)
 
             # test_case: dict[key][x, y, t_otwarcia, t_zamkniecia, ps, t_maxPS]
-
-            if rand_place not in visited_places \
-                    and self.test_case[rand_place][2] < current_time < self.test_case[rand_place][3] \
-                    and current_time + self.test_case[rand_place][5] * alpha < self.all_available_time:
+            if self.test_case[rand_place][2] <= current_time < self.test_case[rand_place][3] and current_time + self.test_case[rand_place][5] * alpha < self.all_available_time:
                     # sprawdzenie funkcji dopuszczalnych
 
                 self.answer.append(rand_place)
@@ -37,18 +35,13 @@ class Solution:
                 self.satisfaction_points += int(alpha * self.test_case[rand_place][4])
 
                 current_time += self.test_case[rand_place][5] * alpha
-                visited_places[rand_place] = True
                 last_place = rand_place
-                unacceptable_places.clear()  # znaleziono rozwiazanie, czyszczenie zbioru
-
-            else:
-                unacceptable_places.add(rand_place)  
 
     def neighborhood_of_solution(self):
 
-        answer_to_rand = self.answer
+        answer_to_rand = self.answer.copy()
 
-        while len(answer_to_rand) != 0:
+        while len(answer_to_rand) > 0:
             test_case_to_rand = list(self.test_case.keys())
 
             place_to_override = random_choice(answer_to_rand)
@@ -56,14 +49,12 @@ class Solution:
 
             [current_time, currently_available_time] = self.subtract_first_elem_from_solution(place_to_override)
 
-            while len(test_case_to_rand) != 0:
+            while len(test_case_to_rand) > 0:
                 rand_place = random_choice(test_case_to_rand)
                 test_case_to_rand.remove(rand_place)
                 alpha = random()
 
-                if rand_place not in self.answer \
-                        and self.test_case[rand_place][2] < current_time < self.test_case[rand_place][3] \
-                        and currently_available_time > alpha * self.test_case[rand_place][5]:
+                if rand_place not in self.answer and self.test_case[rand_place][2] <= current_time < self.test_case[rand_place][3] and currently_available_time > alpha * self.test_case[rand_place][5]:
 
                     place_to_override_index = self.answer.index(place_to_override)
 
@@ -88,7 +79,8 @@ class Solution:
         last_elem: str = '0'
         currently_available_time = self.all_available_time
 
-        for elem, alpha in self.answer, self.alphas:
+        for elem, alpha in zip(self.answer, self.alphas):
+
             if elem == first_elem:
                 if last_elem != '0':
                     used_time -= self.t_displacement[last_elem][elem]
@@ -117,7 +109,7 @@ def count_t_displacement(test_case: dict, velocity: int) -> dict:
                 x_displacement = test_case[finish][0] - test_case[start][0]
                 y_displacement = test_case[finish][1] - test_case[start][1]
                 displacement = sqrt(pow(x_displacement, 2) + pow(y_displacement, 2))
-                t_displacement = displacement/velocity
+                t_displacement = int(displacement/velocity)
                 temp_dict[finish] = t_displacement
         t_displacements[start] = temp_dict
 
