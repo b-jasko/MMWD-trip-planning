@@ -1,4 +1,5 @@
 from random import random
+from random import choice as random_choice
 
 
 class Solution:
@@ -16,8 +17,8 @@ class Solution:
         unacceptable_places = set()
 
         while available_time > current_time and len(unacceptable_places) < len(test_case):
-            rand_place = random.chice(test_case.keys())
-            alpha = random(0, 1)  # współczynnik ilości czasu spędzonego w danym miejscu
+            rand_place = random_choice(test_case.keys())
+            alpha = random()  # współczynnik ilości czasu spędzonego w danym miejscu
 
             if last_place != 0:
                 current_time += t_displacement[last_place][rand_place]
@@ -42,18 +43,21 @@ class Solution:
                 unacceptable_places.add(rand_place)  
 
     def neighborhood_of_solution(self):
-        rand_but_not_visited = set()
-        rand_but_not_visited_sec = set()
 
-        while len(rand_but_not_visited) < len(self.answer):
+        answer_to_rand = self.answer
 
-            place_to_override = random.choice(self.answer)
+        while len(answer_to_rand) != 0:
+            test_case_to_rand = list(self.test_case.keys())
+
+            place_to_override = random_choice(answer_to_rand)
+            answer_to_rand.remove(place_to_override)
 
             [current_time, currently_available_time] = self.subtract_first_elem_from_solution(place_to_override)
 
-            while len(rand_but_not_visited_sec) < len(self.test_case):
-                rand_place = random.chice(self.test_case.keys())
-                alpha = random(0, 1)
+            while len(test_case_to_rand) != 0:
+                rand_place = random_choice(test_case_to_rand)
+                test_case_to_rand.remove(rand_place)
+                alpha = random()
 
                 if rand_place not in self.answer \
                         and self.test_case[rand_place][2] < current_time < self.test_case[rand_place][3] \
@@ -73,15 +77,8 @@ class Solution:
                     self.satisfaction_points -= self.alphas[place_to_override_index] * self.test_case[place_to_override][4]
                     self.satisfaction_points += alpha * self.test_case[rand_place][4]
 
-                    return None  # podmienilismy rozwiazanie konczymy dzialanie funkcji
-
-                else:
-                    rand_but_not_visited_sec = rand_place
-
-            rand_but_not_visited_sec.clear()
-            rand_but_not_visited = place_to_override
-
-        return None
+                    return 0  # podmienilismy rozwiazanie konczymy dzialanie funkcji
+        return 1
 
     def subtract_first_elem_from_solution(self, first_elem: str) -> [int, int]:
         used_time = 0
