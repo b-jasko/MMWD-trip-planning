@@ -30,7 +30,7 @@ class TestSolution(unittest.TestCase):
 
         self.assertEqual(10, solution.satisfaction_points)
 
-    def test_subtract_place_from_solution(self):
+    def test_get_current_time(self):
         solution = Solution(temp_test_case, 1, 100)
         solution.answer = list(temp_test_case)
         solution.alphas = [1, 1, 1]

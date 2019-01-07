@@ -12,7 +12,7 @@ test_case = {'Kraków': (22, 16, 0, 100, 3, 13), 'Warszawa': (27, 20, 0, 100, 5,
 
 
 def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
-              t_min: int, len_of_sol: int) -> List[Solution]:
+              t_min: int, num_of_neig: int, len_of_sol: int) -> List[Solution]:
 
     solution = Solution(test_case, velocity, available_time)
     current_solution = deepcopy(solution)
@@ -20,14 +20,23 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
 
     for temperature in range(t_max, t_min, -1):
         solution = deepcopy(current_solution)
-        if_not_exist = Solution.neighborhood_of_solution(solution)
-        if if_not_exist == 1:
-            #best_solutions.append(current_solution)
+        temp_list = []
+        for iterator in range(0, num_of_neig):
+            if_not_exist = Solution.neighborhood_of_solution(solution)
+            temp_list.append((deepcopy(solution), if_not_exist))
+            if if_not_exist:
+                break
+        temp_list.sort(key=lambda sol: sol[0].satisfaction_points, reverse=True)
+        if_not_exist = temp_list[0][1]
+        solution = temp_list[0][0]
+
+        if if_not_exist:
             if_doesnt_work = Solution.neigh_if_few_test_cases(solution)
-            if if_doesnt_work == 1:
+            if if_doesnt_work:
+                best_solutions.append(current_solution)
                 break
 
-        next_solution = solution
+        next_solution = deepcopy(solution)
 
         difference_of_energy = next_solution.satisfaction_points - current_solution.satisfaction_points
 
@@ -38,12 +47,13 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
             current_solution = next_solution
 
         if len(best_solutions) > len_of_sol:
+            best_solutions.sort(key=lambda sol: sol.satisfaction_points)
             del best_solutions[0]
 
     return best_solutions
 
 
-listen = algorithm(test_case, 0.5, 90, 1500, 1, 10)
+listen = algorithm(test_case, 1, 130, 1500, 1, 10, 10)
 for i in listen:
     print(i.answer)
     print(i.satisfaction_points)
