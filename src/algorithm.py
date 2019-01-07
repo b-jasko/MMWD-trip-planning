@@ -1,24 +1,28 @@
 from math import exp
 from random import random
 from typing import List
+from copy import deepcopy
 
-from src.solution import Solution, count_t_displacement
+from src.solution import Solution
 
-test_case = {'Kraków': (22, 15, 0, 100, 3, 13), 'Warszawa': (25, 20, 0, 100, 5, 15), 'Lublin': (27, 19, 0, 100, 2, 10)}
+test_case = {'Kraków': (22, 16, 0, 100, 3, 13), 'Warszawa': (27, 20, 0, 100, 5, 15), 'Lublin': (33, 19, 0, 100, 2, 10),
+             'Zabrze': (20, 14, 6, 80, 1, 3), 'Frysztak': (30, 15, 0, 100, 8, 8), 'Jasło': (29, 14, 11, 60, 1, 8),
+             'Krosno': (31, 14, 3, 80, 1, 7), 'Rzeszów': (32, 16, 6, 50, 2, 10), 'Dębica': (29, 16, 0, 100, 1, 9),
+             'Londyn': (-30, 60, 0, 100, 10, 20), 'Zgierz': (21, 20, 0, 100, 1, 1), 'Paryż': (-25, 10, 0, 100, 10, 20)}
 
 
 def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
               t_min: int, len_of_sol: int) -> List[Solution]:
 
     solution = Solution(test_case, velocity, available_time)
-    current_solution = solution
+    current_solution = deepcopy(solution)
     best_solutions = []
 
-    for temperature in range(t_min, t_max):
-        solution = current_solution
+    for temperature in range(t_max, t_min, -1):
+        solution = deepcopy(current_solution)
         if_not_exist = Solution.neighborhood_of_solution(solution)
         if if_not_exist == 1:
-            best_solutions.append(current_solution)
+            #best_solutions.append(current_solution)
             if_doesnt_work = Solution.neigh_if_few_test_cases(solution)
             if if_doesnt_work == 1:
                 break
@@ -39,6 +43,7 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
     return best_solutions
 
 
-listen = algorithm(test_case, 0.5, 1000, 1500, 10, 10)
+listen = algorithm(test_case, 0.5, 90, 1500, 1, 10)
 for i in listen:
     print(i.answer)
+    print(i.satisfaction_points)
