@@ -4,7 +4,7 @@ from random import choice as random_choice
 
 
 class Solution:
-    def __init__(self, test_case: dict, velocity: int, available_time: int):
+    def __init__(self, test_case: dict, velocity: int, available_time: int) -> None:
         self.answer = []
         self.alphas = []
         self.satisfaction_points = 0
@@ -27,8 +27,9 @@ class Solution:
                 # dodanie do aktualnego czasu czas podróży (chyba że jest to pierwsze miejsce)
 
             # test_case: dict[key][x, y, t_otwarcia, t_zamkniecia, ps, t_maxPS]
-            if self.test_case[rand_place][2] <= current_time < self.test_case[rand_place][3] and current_time + self.test_case[rand_place][5] * alpha < self.all_available_time:
-                    # sprawdzenie funkcji dopuszczalnych
+            if self.test_case[rand_place][2] <= current_time < self.test_case[rand_place][3] and current_time + \
+                    self.test_case[rand_place][5] * alpha < self.all_available_time:
+                # sprawdzenie funkcji dopuszczalnych
 
                 self.answer.append(rand_place)
                 self.alphas.append(alpha)
@@ -43,7 +44,7 @@ class Solution:
             points += int(self.alphas[self.answer.index(place)] * self.test_case[place][4])
         self.satisfaction_points = points
 
-    def neighborhood_of_solution(self):
+    def neighborhood_of_solution(self) -> bool:
 
         answer_to_rand = self.answer.copy()
 
@@ -58,12 +59,33 @@ class Solution:
             while len(test_case_to_rand) > 0:
                 rand_place = random_choice(test_case_to_rand)
                 test_case_to_rand.remove(rand_place)
+                place_to_override_index = self.answer.index(place_to_override)
+
                 alpha = random()
 
-                if rand_place not in self.answer and self.test_case[rand_place][2] <= current_time < self.test_case[rand_place][3] and currently_available_time > alpha * self.test_case[rand_place][5]:
+                def is_proper() -> bool:
+                    if place_to_override_index == len(self.answer) - 1:
+                        isproper = rand_place not in self.answer \
+                                    and self.test_case[rand_place][2] <= current_time + \
+                                    self.t_displacement[self.answer[place_to_override_index - 1]][rand_place] \
+                                    and current_time + self.t_displacement[self.answer[place_to_override_index - 1]][
+                                        rand_place] + \
+                                    self.test_case[rand_place][5] * alpha < self.test_case[rand_place][3] \
+                                    and currently_available_time > alpha * self.test_case[rand_place][5] + \
+                                    self.t_displacement[self.answer[place_to_override_index - 1]][rand_place]
+                    else:
+                        isproper = rand_place not in self.answer \
+                                   and self.test_case[rand_place][2] <= current_time + \
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][rand_place] \
+                                   and current_time + self.t_displacement[self.answer[place_to_override_index - 1]][
+                                       rand_place] + \
+                                   self.test_case[rand_place][5] * alpha < self.test_case[rand_place][3] \
+                                   and currently_available_time > alpha * self.test_case[rand_place][5] + \
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][rand_place] + \
+                                   self.t_displacement[self.answer[place_to_override_index + 1]][rand_place]
+                    return isproper
 
-                    place_to_override_index = self.answer.index(place_to_override)
-
+                if is_proper():
                     # wpisanie rand_place na listę rozwiązań w miejscu place_to_override
                     del self.answer[place_to_override_index]
                     self.answer.insert(place_to_override_index, rand_place)
@@ -75,10 +97,10 @@ class Solution:
                     # odjęcie punktów satysfakcji dla miejsca place_to_override oraz dodanie dla rand_place
                     self.count_satisfaction_points()
 
-                    return 0  # podmienilismy rozwiazanie konczymy dzialanie funkcji
-        return 1
+                    return False  # podmienilismy rozwiazanie konczymy dzialanie funkcji
+        return True
 
-    def neigh_if_few_test_cases(self):
+    def neigh_if_few_test_cases(self) -> bool:
         answer_to_rand = self.answer.copy()
 
         while len(answer_to_rand) > 0:
@@ -87,7 +109,8 @@ class Solution:
             place_to_override = random_choice(answer_to_rand)
             answer_to_rand.remove(place_to_override)
 
-            [current_time_1, currently_available_time] = self.get_current_time(place_to_override, self.all_available_time)
+            [current_time_1, currently_available_time] = self.get_current_time(place_to_override,
+                                                                               self.all_available_time)
 
             while len(test_case_to_rand) > 0:
                 rand_place = random_choice(test_case_to_rand)
@@ -97,8 +120,10 @@ class Solution:
                 alpha_1 = random()
                 alpha_2 = random()
 
-                if rand_place in self.answer and self.test_case[rand_place][2] <= current_time_1 < self.test_case[rand_place][3] and self.test_case[place_to_override][2] <= current_time_2 < self.test_case[place_to_override][3] and currently_available_time > alpha_1 * self.test_case[rand_place][5] + alpha_2 * self.test_case[place_to_override][5]:
-
+                if rand_place in self.answer and self.test_case[rand_place][2] <= current_time_1 < \
+                        self.test_case[rand_place][3] and self.test_case[place_to_override][2] <= current_time_2 < \
+                        self.test_case[place_to_override][3] and currently_available_time > alpha_1 * \
+                        self.test_case[rand_place][5] + alpha_2 * self.test_case[place_to_override][5]:
                     place_to_override_index = self.answer.index(place_to_override)
                     rand_place_index = self.answer.index(rand_place)
 
@@ -119,10 +144,10 @@ class Solution:
                     # odjęcie punktów satysfakcji dla miejsca place_to_override oraz dodanie dla rand_place
                     self.count_satisfaction_points()
 
-                    return 0  # podmienilismy rozwiazanie konczymy dzialanie funkcji
-        return 1
+                    return False  # podmienilismy rozwiazanie konczymy dzialanie funkcji
+        return True
 
-    def get_current_time(self, place: str, all_available_time) -> [int, int]:
+    def get_current_time(self, place: str, all_available_time: int) -> [int, int]:
         used_time = 0
         current_time = 0
         last_elem: str = '0'
@@ -159,7 +184,7 @@ def count_t_displacement(test_case: dict, velocity: int) -> dict:
                 x_displacement = test_case[finish][0] - test_case[start][0]
                 y_displacement = test_case[finish][1] - test_case[start][1]
                 displacement = sqrt(pow(x_displacement, 2) + pow(y_displacement, 2))
-                t_displacement = int(displacement/velocity)
+                t_displacement = int(displacement / velocity)
                 temp_dict[finish] = t_displacement
         t_displacements[start] = temp_dict
 
