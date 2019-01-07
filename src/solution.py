@@ -4,12 +4,12 @@ from random import choice as random_choice
 
 
 class Solution:
-    def __init__(self, test_case: dict, t_displacement: dict, available_time: int):
+    def __init__(self, test_case: dict, velocity: int, available_time: int):
         self.answer = []
         self.alphas = []
         self.satisfaction_points = 0
         self.test_case = test_case
-        self.t_displacement = t_displacement
+        self.t_displacement = count_t_displacement(test_case, velocity)
         self.all_available_time = available_time
 
         current_time = 0
@@ -32,10 +32,16 @@ class Solution:
 
                 self.answer.append(rand_place)
                 self.alphas.append(alpha)
-                self.satisfaction_points += int(alpha * self.test_case[rand_place][4])
 
                 current_time += self.test_case[rand_place][5] * alpha
                 last_place = rand_place
+        self.count_satisfaction_points()
+
+    def count_satisfaction_points(self) -> None:
+        points = 0
+        for place in self.answer:
+            points += int(self.alphas[self.answer.index(place)] * self.test_case[place][4])
+        self.satisfaction_points = points
 
     def neighborhood_of_solution(self):
 
@@ -47,7 +53,7 @@ class Solution:
             place_to_override = random_choice(answer_to_rand)
             answer_to_rand.remove(place_to_override)
 
-            [current_time, currently_available_time] = self.subtract_first_elem_from_solution(place_to_override)
+            [current_time, currently_available_time] = self.get_current_time(place_to_override, self.all_available_time)
 
             while len(test_case_to_rand) > 0:
                 rand_place = random_choice(test_case_to_rand)
@@ -67,34 +73,78 @@ class Solution:
                     self.alphas.insert(place_to_override_index, alpha)
 
                     # odjęcie punktów satysfakcji dla miejsca place_to_override oraz dodanie dla rand_place
-                    self.satisfaction_points -= self.alphas[place_to_override_index] * self.test_case[place_to_override][4]
-                    self.satisfaction_points += alpha * self.test_case[rand_place][4]
+                    self.count_satisfaction_points()
 
                     return 0  # podmienilismy rozwiazanie konczymy dzialanie funkcji
         return 1
 
-    def subtract_first_elem_from_solution(self, first_elem: str) -> [int, int]:
+    def neigh_if_few_test_cases(self):
+        answer_to_rand = self.answer.copy()
+
+        while len(answer_to_rand) > 0:
+            test_case_to_rand = list(self.test_case.keys())
+
+            place_to_override = random_choice(answer_to_rand)
+            answer_to_rand.remove(place_to_override)
+
+            [current_time_1, currently_available_time] = self.get_current_time(place_to_override, self.all_available_time)
+
+            while len(test_case_to_rand) > 0:
+                rand_place = random_choice(test_case_to_rand)
+                test_case_to_rand.remove(rand_place)
+                [current_time_2, currently_available_time] = self.get_current_time(rand_place, currently_available_time)
+
+                alpha_1 = random()
+                alpha_2 = random()
+
+                if rand_place in self.answer and self.test_case[rand_place][2] <= current_time_1 < self.test_case[rand_place][3] and self.test_case[place_to_override][2] <= current_time_2 < self.test_case[place_to_override][3] and currently_available_time > alpha_1 * self.test_case[rand_place][5] + alpha_2 * self.test_case[place_to_override][5]:
+
+                    place_to_override_index = self.answer.index(place_to_override)
+                    rand_place_index = self.answer.index(rand_place)
+
+                    # zamiana miejscami rand_place i place_to_override na liście rozwiązań
+                    del self.answer[place_to_override_index]
+                    self.answer.insert(place_to_override_index, rand_place)
+
+                    del self.answer[rand_place_index]
+                    self.answer.insert(rand_place_index, place_to_override)
+
+                    # to samo dla alpha
+                    del self.alphas[place_to_override_index]
+                    self.alphas.insert(place_to_override_index, alpha_1)
+
+                    del self.alphas[rand_place_index]
+                    self.alphas.insert(rand_place_index, alpha_2)
+
+                    # odjęcie punktów satysfakcji dla miejsca place_to_override oraz dodanie dla rand_place
+                    self.count_satisfaction_points()
+
+                    return 0  # podmienilismy rozwiazanie konczymy dzialanie funkcji
+        return 1
+
+    def get_current_time(self, place: str, all_available_time) -> [int, int]:
         used_time = 0
         current_time = 0
         last_elem: str = '0'
-        currently_available_time = self.all_available_time
+        last_alpha: str = '0'
+        currently_available_time = all_available_time
 
         for elem, alpha in zip(self.answer, self.alphas):
 
-            if elem == first_elem:
+            if elem == place:
                 if last_elem != '0':
-                    used_time -= self.t_displacement[last_elem][elem]
-                    last_elem = elem
                     current_time = used_time
-            elif last_elem == first_elem:
-                used_time -= self.t_displacement[last_elem][elem]
-                used_time += self.test_case[elem][5] * alpha
-                last_elem = elem
+                    used_time += self.test_case[last_elem][5] * last_alpha
+            elif last_elem == place:
+                pass
             else:
-                used_time += self.test_case[elem][5] * alpha
-                last_elem = elem
-
-            currently_available_time -= used_time
+                if last_elem != '0':
+                    used_time += self.test_case[last_elem][5] * last_alpha
+                    used_time += self.t_displacement[last_elem][elem]
+            last_elem = elem
+            last_alpha = alpha
+        used_time += self.test_case[last_elem][5] * last_alpha
+        currently_available_time -= used_time
 
         return [current_time, currently_available_time]
 

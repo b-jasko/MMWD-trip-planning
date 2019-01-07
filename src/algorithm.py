@@ -10,9 +10,7 @@ test_case = {'Kraków': (22, 15, 0, 100, 3, 13), 'Warszawa': (25, 20, 0, 100, 5,
 def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
               t_min: int, len_of_sol: int) -> List[Solution]:
 
-    t_displacement = count_t_displacement(test_case, velocity)
-
-    solution = Solution(test_case, t_displacement, available_time)
+    solution = Solution(test_case, velocity, available_time)
     current_solution = solution
     best_solutions = []
 
@@ -20,7 +18,10 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
         solution = current_solution
         if_not_exist = Solution.neighborhood_of_solution(solution)
         if if_not_exist == 1:
-            break
+            best_solutions.append(current_solution)
+            if_doesnt_work = Solution.neigh_if_few_test_cases(solution)
+            if if_doesnt_work == 1:
+                break
 
         next_solution = solution
 
@@ -38,4 +39,6 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
     return best_solutions
 
 
-print(algorithm(test_case, 0.5, 1000, 1500, 10, 10))
+listen = algorithm(test_case, 0.5, 1000, 1500, 10, 10)
+for i in listen:
+    print(i.answer)
