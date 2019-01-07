@@ -1,21 +1,46 @@
 from pandas import DataFrame
-from random import randint
+from random import randint, sample
 
 print('Enter number of places:')
 N = int(input())
 print('Enter filename:')
 filename = input()
 
-variables = []
+X = []
+Y = []
+t_o = []
+t_z = []
+PS = [randint(1, 10) for r in range(N)]
+t_maxPS = []
 
-for i in range(6):
-    variables.append([randint(0, 20) for r in range(N)])
+max_distance = 20
+max_closing_time = 40
+places = []
+i = 0
+
+while i < N:
+    x = randint(0, max_distance)
+    y = randint(0, max_distance)
+    pair = [x, y]
+    if pair not in places:
+        places.append(pair)
+        X.append(x)
+        Y.append(y)
+        i += 1
+
+for i in range(N):
+    temp = sorted(sample(range(1, max_closing_time), 2))
+    t_o.append(temp[0])
+    t_z.append(temp[1])
+    t_maxPS.append(randint(1, temp[1] - temp[0]))
 
 df = DataFrame({
-    'X': variables[0],
-    'Y': variables[1],
-    't_o': variables[2],
-    't_z': variables[3],
-    'PS': variables[4],
-    't_maxPS': variables[5]})
+    'X': X,
+    'Y': Y,
+    't_o': t_o,
+    't_z': t_z,
+    'PS': PS,
+    't_maxPS': t_maxPS})
 df.to_excel('../testcases/' + filename + '.xls', index=False)
+
+
