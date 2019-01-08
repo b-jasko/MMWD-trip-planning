@@ -93,7 +93,7 @@ class Solution:
 
                     return isproper
 
-                if is_proper():
+                if is_proper() and rand_place not in self.answer:
                     # wpisanie rand_place na listę rozwiązań w miejscu place_to_override
                     del self.answer[place_to_override_index]
                     self.answer.insert(place_to_override_index, rand_place)
@@ -105,6 +105,8 @@ class Solution:
                     # odjęcie punktów satysfakcji dla miejsca place_to_override oraz dodanie dla rand_place
                     self.count_satisfaction_points()
 
+                    self.add_place_to_solution()
+
                     return False  # podmienilismy rozwiazanie konczymy dzialanie funkcji
         return True
 
@@ -112,24 +114,27 @@ class Solution:
         answer_to_rand = self.answer.copy()
 
         while len(answer_to_rand) > 0:
-            test_case_to_rand = list(self.test_case.keys())
+            test_case_to_rand = list(self.answer)
 
             place_to_override = random_choice(answer_to_rand)
             answer_to_rand.remove(place_to_override)
             place_to_override_index = self.answer.index(place_to_override)
+
+            if (place_to_override == 0 or place_to_override_index == len(self.answer) - 1):
+                continue
 
             [current_time_1, currently_available_time] = self.get_current_time(place_to_override,
                                                                                self.all_available_time)
 
             while len(test_case_to_rand) > 0:
                 rand_place = random_choice(test_case_to_rand)
+                rand_place_index = self.answer.index(rand_place)
                 test_case_to_rand.remove(rand_place)
                 if rand_place == place_to_override \
-                        or (rand_place_index == 0 and place_to_override_index == len(self.answer)-1)\
-                        or (rand_place_index == len(self.answer)-1 and place_to_override_index == 0):
+                    or (place_to_override == 0 or place_to_override_index == len(self.answer) - 1):
                     continue
 
-                rand_place_index = self.answer.index(rand_place)
+
 
                 [current_time_2, currently_available_time] = self.get_current_time(rand_place, self.all_available_time)
                 currently_available_time += self.test_case[place_to_override][5] * self.alphas[place_to_override_index]\
@@ -229,6 +234,8 @@ class Solution:
                     # odjęcie punktów satysfakcji dla miejsca place_to_override oraz dodanie dla rand_place
                     self.count_satisfaction_points()
 
+                    self.add_place_to_solution()
+
                     return False  # podmienilismy rozwiazanie konczymy dzialanie funkcji
         return True
 
@@ -257,6 +264,27 @@ class Solution:
         currently_available_time -= used_time
 
         return [current_time, currently_available_time]
+
+    def add_place_to_solution(self):
+        unused_places = list(set(self.test_case.keys()) - set(self.answer))
+        while len(unused_places) > 0:
+            [current_time, currently_available_time] = self.get_current_time(self.answer[len(self.answer)-1], self.all_available_time)
+            current_time += self.t_displacement[self.answer[len(self.answer)-2]][self.answer[len(self.answer)-1]] + \
+                            self.test_case[self.answer[len(self.answer)-1]][5] * self.alphas[len(self.answer)-1]
+            currently_available_time = self.all_available_time - current_time
+
+            rand_place = random_choice(unused_places)
+            unused_places.remove(rand_place)
+            alpha = random()
+
+            if currently_available_time >= current_time + self.t_displacement[self.answer[len(self.answer)-1]][rand_place] + \
+                self.test_case[rand_place][5] * alpha and \
+                self.test_case[rand_place][2] <= current_time + self.t_displacement[self.answer[len(self.answer)-1]][rand_place] and \
+                self.test_case[rand_place][3] >= current_time + self.t_displacement[self.answer[len(self.answer)-1]][rand_place] + self.test_case[rand_place][5] * alpha:
+                self.answer.append(rand_place)
+                self.alphas.append(alpha)
+                self.count_satisfaction_points()
+                unused_places = list(set(self.test_case.keys()) - set(self.answer))
 
 
 def count_t_displacement(test_case: dict, velocity: int) -> dict:
