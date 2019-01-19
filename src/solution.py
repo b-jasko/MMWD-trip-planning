@@ -1,6 +1,8 @@
 from math import sqrt
 from random import random
 from random import choice as random_choice
+import matplotlib.pyplot as plt
+from typing import List
 
 
 class Solution:
@@ -12,7 +14,7 @@ class Solution:
         self.t_displacement = count_t_displacement(test_case, velocity)
         self.all_available_time = available_time
 
-        current_time = 0
+        current_time = min(x[2] for x in test_case.values())
         last_place = 0
         places_to_rand = list(self.test_case)
 
@@ -131,11 +133,10 @@ class Solution:
                 rand_place_index = self.answer.index(rand_place)
                 test_case_to_rand.remove(rand_place)
                 if rand_place == place_to_override \
-                        or (place_to_override_index == 0 or place_to_override_index == len(self.answer) - 1) \
+                        or (rand_place_index == 0 or rand_place_index == len(self.answer) - 1) \
                         or place_to_override_index+1 == rand_place_index \
                         or place_to_override_index-1 == rand_place_index:
                     continue
-
 
 
                 [current_time_2, currently_available_time] = self.get_current_time(rand_place, self.all_available_time)
