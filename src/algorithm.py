@@ -50,6 +50,7 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
             best_solutions.sort(key=lambda sol: sol.satisfaction_points)
             del best_solutions[0]
 
+    best_solutions.sort(key=lambda sol: sol.satisfaction_points)
     return best_solutions
 
 

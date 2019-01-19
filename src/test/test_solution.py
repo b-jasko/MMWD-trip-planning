@@ -43,6 +43,18 @@ class TestSolution(unittest.TestCase):
 
         # ---------------------------------------------------
 
+        solution = Solution(temp_test_case, 1, 100)
+        solution.answer = list(temp_test_case)
+        solution.alphas = [1, 1, 1]
+
+        ans = Solution.get_current_time(solution, 'Lublin', solution.all_available_time)
+        [current_time, currently_available_time] = ans
+
+        self.assertEqual(31, current_time)
+        self.assertEqual(69, currently_available_time)  # 100-[Krakow(13)+trasa(3)+Warszawa(15)] = 69
+
+        # ---------------------------------------------------
+
         solution = Solution(temp_test_case_2, 1, 100)
         solution.answer = list(temp_test_case)
         solution.alphas = [1, 1, 1]
@@ -50,7 +62,7 @@ class TestSolution(unittest.TestCase):
         ans = Solution.get_current_time(solution, 'Warszawa', solution.all_available_time)
         [current_time, currently_available_time] = ans
 
-        self.assertEqual(0, current_time)
+        self.assertEqual(30, current_time)
         self.assertEqual(50, currently_available_time)  # 100-[Kraków(30)+trasa(2)+Lublin(20)] = 50
 
     def test_count_t_displacement(self):

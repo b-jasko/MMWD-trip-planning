@@ -243,8 +243,8 @@ class Solution:
 
             if elem == place:
                 if last_elem != '0':
-                    current_time = used_time
                     used_time += self.test_case[last_elem][5] * last_alpha
+                    current_time = used_time
             elif last_elem == place:
                 pass
             else:
@@ -253,7 +253,8 @@ class Solution:
                     used_time += self.t_displacement[last_elem][elem]
             last_elem = elem
             last_alpha = alpha
-        used_time += self.test_case[last_elem][5] * last_alpha
+        if place != last_elem:
+            used_time += self.test_case[last_elem][5] * last_alpha
         currently_available_time -= used_time
 
         return [current_time, currently_available_time]
