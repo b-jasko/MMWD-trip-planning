@@ -44,7 +44,7 @@ class Solution:
     def count_satisfaction_points(self) -> None:
         points = 0
         for place in self.answer:
-            points += int(self.alphas[self.answer.index(place)] * self.test_case[place][4])
+            points += round(self.alphas[self.answer.index(place)] * self.test_case[place][4])
         self.satisfaction_points = points
 
     def neighborhood_of_solution(self) -> bool:
@@ -298,3 +298,16 @@ def count_t_displacement(test_case: dict, velocity: int) -> dict:
         t_displacements[start] = temp_dict
 
     return t_displacements
+
+
+class PlotSpIterations:
+    def __init__(self, iterations, sp):
+        self.sp: List[int] = sp
+        self.iterations: List[int] = iterations
+
+    def add_data(self, iterations, sp):
+        self.sp.append(sp)
+        self.iterations.append(iterations)
+
+    def plot_data(self):
+        plt.plot(self.iterations, self.sp)

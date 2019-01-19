@@ -3,7 +3,7 @@ from random import random
 from typing import List
 from copy import deepcopy
 
-from src.solution import Solution
+from src.solution import Solution, PlotSpIterations
 from src.testcase_generator import import_testcase
 
 # test_case = {'Kraków': (22, 16, 0, 100, 3, 13), 'Warszawa': (27, 20, 0, 100, 5, 15), 'Lublin': (33, 19, 0, 100, 2, 10),
@@ -16,7 +16,7 @@ test_case = {'0': (17, 1, 8, 91, 10, 4), '1': (8, 9, 5, 73, 9, 8), '2': (6, 15, 
 
 
 def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
-              t_min: int, num_of_neig: int, len_of_sol: int) -> List[Solution]:
+              t_min: int, num_of_neig: int, len_of_sol: int, plot: PlotSpIterations) -> List[Solution]:
     solution = Solution(test_case, velocity, available_time)
     current_solution = deepcopy(solution)
     best_solutions = []
@@ -46,10 +46,13 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
         if difference_of_energy > 0:
             current_solution = next_solution
             best_solutions.append(next_solution)
+            PlotSpIterations.add_data(plot, temperature, current_solution.satisfaction_points)
+
         elif exp(difference_of_energy / temperature) > random():
             current_solution = next_solution
+            plot.add_data(temperature, current_solution.satisfaction_points)
 
-        if len(best_solutions) > len_of_sol:
+        if len(best_solutions) >= len_of_sol:
             best_solutions.sort(key=lambda sol: sol.satisfaction_points)
             del best_solutions[0]
 
@@ -57,7 +60,9 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
     return best_solutions
 
 
-listen = algorithm(test_case, 1, 130, 1500, 1, 10, 10)
+plot = PlotSpIterations([0], [0])
+listen = algorithm(test_case, 1, 130, 1500, 1, 10, 10, plot)
 for i in listen:
     print(i.answer)
     print(i.satisfaction_points)
+plot.plot_data()

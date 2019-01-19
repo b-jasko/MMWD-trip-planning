@@ -2,6 +2,7 @@ import unittest
 
 from src.solution import Solution
 from src.solution import count_t_displacement
+from src.solution import PlotSpIterations
 
 temp_test_case = {'Kraków': (22, 15, 0, 100, 3, 13), 'Warszawa': (25, 15, 0, 100, 5, 15),
                   'Lublin': (27, 15, 0, 100, 2, 10)}
@@ -71,6 +72,19 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(3, t_displacement['Kraków']['Warszawa'])
         self.assertEqual(5, t_displacement['Kraków']['Lublin'])
         self.assertEqual(2, t_displacement['Lublin']['Warszawa'])
+
+
+class TestPsIterations(unittest.TestCase):
+    def test_init(self):
+        test = PlotSpIterations([1, 2, 3], [1, 2, 1])
+        self.assertEqual(test.iterations, [1, 2, 3])
+        self.assertEqual(test.ps, [1, 2, 1])
+
+    def test_add_data(self):
+        test = PlotSpIterations([1, 2, 3], [1, 2, 1])
+        test.add_data(5, 7)
+        self.assertEqual(test.iterations, [1, 2, 3, 5])
+        self.assertEqual(test.ps, [1, 2, 1, 7])
 
 
 if __name__ == '__main__':
