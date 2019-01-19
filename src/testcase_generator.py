@@ -1,4 +1,4 @@
-from pandas import DataFrame, read_excel
+from pandas import DataFrame
 from random import randint, sample
 
 
@@ -45,14 +45,4 @@ def generate_xls_testcase():
         't_maxPS': t_maxPS})
     df.to_excel('../testcases/' + filename + '.xlsx', index=False)
 
-
-def import_testcase() -> dict:
-    print('Enter filename to import:')
-    filename = input()
-    df = read_excel('../testcases/' + filename + '.xlsx')
-    testcase = {str(df.index[i]): tuple(df.loc[i, :]) for i in range(df.index[-1] + 1)}
-    print(testcase)
-    return testcase
-
-
-# generate_xls_testcase()
+generate_xls_testcase()

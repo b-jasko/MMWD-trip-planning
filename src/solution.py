@@ -1,8 +1,9 @@
 from math import sqrt
-from random import random
 from random import choice as random_choice
-import matplotlib.pyplot as plt
+from random import random
 from typing import List
+
+import matplotlib.pyplot as plt
 
 
 class Solution:
