@@ -35,6 +35,7 @@ class Solution:
 
                 self.answer.append(rand_place)
                 self.alphas.append(alpha)
+                places_to_rand = list(set(test_case)-set(self.answer))
 
                 current_time += self.test_case[rand_place][5] * alpha
                 last_place = rand_place
