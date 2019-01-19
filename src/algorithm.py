@@ -49,15 +49,18 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
         next_solution = deepcopy(solution)
 
         difference_of_energy = next_solution.satisfaction_points - current_solution.satisfaction_points
+        probability = exp(1000 * difference_of_energy / temperature)
 
         if difference_of_energy > 0:
             current_solution = next_solution
             best_solutions.append(next_solution)
-            PlotSpIterations.add_data(plot, temperature, current_solution.satisfaction_points)
-
-        elif exp(difference_of_energy / temperature) > random():
-            current_solution = next_solution
             plot.add_data(temperature, current_solution.satisfaction_points)
+
+        elif probability > random():
+            plot.add_prob_data(temperature, probability)
+            print('temperature: %5.2f  probability: %5.2f\n' % (temperature, probability))
+            plot.add_data(temperature, current_solution.satisfaction_points)
+            current_solution = next_solution
 
         if len(best_solutions) >= len_of_sol:
             best_solutions.sort(key=lambda sol: sol.satisfaction_points)
@@ -68,12 +71,13 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
 
 
 test_case = import_testcase()
-plot = PlotSpIterations([0], [0])
+plot = PlotSpIterations([], [])
 start = time.time()
-listen = algorithm(test_case, 1, 130, 1500, 1, 1, 10, plot)
+listen = algorithm(test_case, 1, 130, 1500, 1, 10, 10, plot)
 for i in listen:
     print(i.answer)
     print(i.satisfaction_points)
-PlotSpIterations.plot_data(plot)
+plot.plot_data()
 end = time.time()
 print('\nexecution time: ' + str(end - start))
+plot.data_to_xls()

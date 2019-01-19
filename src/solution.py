@@ -2,6 +2,7 @@ from math import sqrt
 from random import choice as random_choice
 from random import random
 from typing import List
+from pandas import DataFrame
 
 import matplotlib.pyplot as plt
 
@@ -36,7 +37,7 @@ class Solution:
 
                 self.answer.append(rand_place)
                 self.alphas.append(alpha)
-                places_to_rand = list(set(test_case)-set(self.answer))
+                places_to_rand = list(set(test_case) - set(self.answer))
 
                 current_time += self.test_case[rand_place][5] * alpha
                 last_place = rand_place
@@ -136,78 +137,138 @@ class Solution:
                 test_case_to_rand.remove(rand_place)
                 if rand_place == place_to_override \
                         or (rand_place_index == 0 or rand_place_index == len(self.answer) - 1) \
-                        or place_to_override_index+1 == rand_place_index \
-                        or place_to_override_index-1 == rand_place_index:
+                        or place_to_override_index + 1 == rand_place_index \
+                        or place_to_override_index - 1 == rand_place_index:
                     continue
 
-
                 [current_time_2, currently_available_time] = self.get_current_time(rand_place, self.all_available_time)
-                currently_available_time += self.test_case[place_to_override][5] * self.alphas[place_to_override_index]\
-                + self.t_displacement[self.answer[place_to_override_index-1]][self.answer[place_to_override_index]]\
-                + self.t_displacement[self.answer[place_to_override_index+1]][self.answer[place_to_override_index]]
+                currently_available_time += self.test_case[place_to_override][5] * self.alphas[place_to_override_index] \
+                                            + self.t_displacement[self.answer[place_to_override_index - 1]][
+                                                self.answer[place_to_override_index]] \
+                                            + self.t_displacement[self.answer[place_to_override_index + 1]][
+                                                self.answer[place_to_override_index]]
 
                 alpha_1 = random()
                 alpha_2 = random()
 
                 def is_proper() -> bool:
                     if place_to_override_index == len(self.answer) - 1:
-                        isproper = currently_available_time >= self.t_displacement[self.answer[place_to_override_index-1]][self.answer[place_to_override_index]] +\
-                            self.test_case[place_to_override][5]*alpha_1 + \
-                            self.t_displacement[self.answer[rand_place_index - 1]][self.answer[rand_place_index]] + \
-                            self.test_case[rand_place][5] * alpha_1 + \
-                            self.t_displacement[self.answer[rand_place_index + 1]][self.answer[rand_place_index]] \
-                            and self.test_case[place_to_override][2] <= current_time_2 + self.t_displacement[self.answer[rand_place_index-1]][self.answer[place_to_override_index]] \
-                            and self.test_case[place_to_override][3] >= current_time_2 + self.t_displacement[self.answer[rand_place_index-1]][self.answer[place_to_override_index]] + self.t_displacement[self.answer[rand_place_index +1]][self.answer[place_to_override_index]] \
-                            and self.test_case[rand_place][2] <= current_time_1 + self.t_displacement[self.answer[place_to_override_index-1]][self.answer[rand_place_index]] \
-                            and self.test_case[rand_place][3] >= current_time_1 + self.t_displacement[self.answer[place_to_override_index-1]][self.answer[rand_place_index]]
+                        isproper = currently_available_time >= \
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][
+                                       self.answer[place_to_override_index]] + \
+                                   self.test_case[place_to_override][5] * alpha_1 + \
+                                   self.t_displacement[self.answer[rand_place_index - 1]][
+                                       self.answer[rand_place_index]] + \
+                                   self.test_case[rand_place][5] * alpha_1 + \
+                                   self.t_displacement[self.answer[rand_place_index + 1]][self.answer[rand_place_index]] \
+                                   and self.test_case[place_to_override][2] <= current_time_2 + \
+                                   self.t_displacement[self.answer[rand_place_index - 1]][
+                                       self.answer[place_to_override_index]] \
+                                   and self.test_case[place_to_override][3] >= current_time_2 + \
+                                   self.t_displacement[self.answer[rand_place_index - 1]][
+                                       self.answer[place_to_override_index]] + \
+                                   self.t_displacement[self.answer[rand_place_index + 1]][
+                                       self.answer[place_to_override_index]] \
+                                   and self.test_case[rand_place][2] <= current_time_1 + \
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][
+                                       self.answer[rand_place_index]] \
+                                   and self.test_case[rand_place][3] >= current_time_1 + \
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][
+                                       self.answer[rand_place_index]]
 
                     elif place_to_override_index == 0:
                         isproper = currently_available_time >= \
-                            self.test_case[place_to_override][5]*alpha_1 + \
-                            self.t_displacement[self.answer[place_to_override_index+1]][self.answer[place_to_override_index]] + \
-                            self.t_displacement[self.answer[rand_place_index - 1]][self.answer[rand_place_index]] + \
-                            self.test_case[rand_place][5] * alpha_1 + \
-                            self.t_displacement[self.answer[rand_place_index + 1]][self.answer[rand_place_index]] \
-                            and self.test_case[place_to_override][2] <= current_time_2 + self.t_displacement[self.answer[rand_place_index-1]][self.answer[place_to_override_index]] \
-                            and self.test_case[place_to_override][3] >= current_time_2 + self.t_displacement[self.answer[rand_place_index-1]][self.answer[place_to_override_index]] + self.t_displacement[self.answer[rand_place_index +1]][self.answer[place_to_override_index]] \
-                            and self.test_case[rand_place][2] <= current_time_1 \
-                            and self.test_case[rand_place][3] >= current_time_1 + self.t_displacement[self.answer[place_to_override_index +1]][self.answer[rand_place_index]]
+                                   self.test_case[place_to_override][5] * alpha_1 + \
+                                   self.t_displacement[self.answer[place_to_override_index + 1]][
+                                       self.answer[place_to_override_index]] + \
+                                   self.t_displacement[self.answer[rand_place_index - 1]][
+                                       self.answer[rand_place_index]] + \
+                                   self.test_case[rand_place][5] * alpha_1 + \
+                                   self.t_displacement[self.answer[rand_place_index + 1]][self.answer[rand_place_index]] \
+                                   and self.test_case[place_to_override][2] <= current_time_2 + \
+                                   self.t_displacement[self.answer[rand_place_index - 1]][
+                                       self.answer[place_to_override_index]] \
+                                   and self.test_case[place_to_override][3] >= current_time_2 + \
+                                   self.t_displacement[self.answer[rand_place_index - 1]][
+                                       self.answer[place_to_override_index]] + \
+                                   self.t_displacement[self.answer[rand_place_index + 1]][
+                                       self.answer[place_to_override_index]] \
+                                   and self.test_case[rand_place][2] <= current_time_1 \
+                                   and self.test_case[rand_place][3] >= current_time_1 + \
+                                   self.t_displacement[self.answer[place_to_override_index + 1]][
+                                       self.answer[rand_place_index]]
 
                     elif rand_place_index == len(self.answer) - 1:
                         isproper = currently_available_time >= \
-                                   self.t_displacement[self.answer[place_to_override_index - 1]][self.answer[place_to_override_index]] + \
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][
+                                       self.answer[place_to_override_index]] + \
                                    self.test_case[place_to_override][5] * alpha_1 + \
-                                   self.t_displacement[self.answer[place_to_override_index + 1]][self.answer[place_to_override_index]] + \
-                                   self.t_displacement[self.answer[rand_place_index - 1]][self.answer[rand_place_index]] + \
+                                   self.t_displacement[self.answer[place_to_override_index + 1]][
+                                       self.answer[place_to_override_index]] + \
+                                   self.t_displacement[self.answer[rand_place_index - 1]][
+                                       self.answer[rand_place_index]] + \
                                    self.test_case[rand_place][5] * alpha_1 \
                                    and self.test_case[place_to_override][2] <= current_time_2 + \
-                                   self.t_displacement[self.answer[rand_place_index - 1]][self.answer[place_to_override_index]] \
+                                   self.t_displacement[self.answer[rand_place_index - 1]][
+                                       self.answer[place_to_override_index]] \
                                    and self.test_case[place_to_override][3] >= current_time_2 + \
-                                   self.t_displacement[self.answer[rand_place_index - 1]][self.answer[place_to_override_index]] \
+                                   self.t_displacement[self.answer[rand_place_index - 1]][
+                                       self.answer[place_to_override_index]] \
                                    and self.test_case[rand_place][2] <= current_time_1 + \
-                                   self.t_displacement[self.answer[place_to_override_index - 1]][self.answer[rand_place_index]] \
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][
+                                       self.answer[rand_place_index]] \
                                    and self.test_case[rand_place][3] >= current_time_1 + \
-                                   self.t_displacement[self.answer[place_to_override_index - 1]][self.answer[rand_place_index]] + \
-                                   self.t_displacement[self.answer[place_to_override_index + 1]][self.answer[rand_place_index]]
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][
+                                       self.answer[rand_place_index]] + \
+                                   self.t_displacement[self.answer[place_to_override_index + 1]][
+                                       self.answer[rand_place_index]]
 
                     elif rand_place_index == 0:
                         isproper = currently_available_time >= \
-                                   self.t_displacement[self.answer[place_to_override_index - 1]][self.answer[place_to_override_index]] + \
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][
+                                       self.answer[place_to_override_index]] + \
                                    self.test_case[place_to_override][5] * alpha_1 + \
-                                   self.t_displacement[self.answer[place_to_override_index + 1]][self.answer[place_to_override_index]] + \
+                                   self.t_displacement[self.answer[place_to_override_index + 1]][
+                                       self.answer[place_to_override_index]] + \
                                    self.test_case[rand_place][5] * alpha_1 + \
                                    self.t_displacement[self.answer[rand_place_index + 1]][self.answer[rand_place_index]] \
                                    and self.test_case[place_to_override][2] <= current_time_2 \
                                    and self.test_case[place_to_override][3] >= current_time_2 + \
-                                   self.t_displacement[self.answer[rand_place_index + 1]][self.answer[place_to_override_index]] \
+                                   self.t_displacement[self.answer[rand_place_index + 1]][
+                                       self.answer[place_to_override_index]] \
                                    and self.test_case[rand_place][2] <= current_time_1 + \
-                                   self.t_displacement[self.answer[place_to_override_index - 1]][self.answer[rand_place_index]] \
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][
+                                       self.answer[rand_place_index]] \
                                    and self.test_case[rand_place][3] >= current_time_1 + \
-                                   self.t_displacement[self.answer[place_to_override_index - 1]][self.answer[rand_place_index]] + \
-                                   self.t_displacement[self.answer[place_to_override_index + 1]][self.answer[rand_place_index]]
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][
+                                       self.answer[rand_place_index]] + \
+                                   self.t_displacement[self.answer[place_to_override_index + 1]][
+                                       self.answer[rand_place_index]]
 
                     else:
-                        isproper = currently_available_time >= self.t_displacement[self.answer[place_to_override_index-1]][self.answer[place_to_override_index]] + self.test_case[place_to_override][5]*alpha_1 + self.t_displacement[self.answer[place_to_override_index+1]][self.answer[place_to_override_index]] + self.t_displacement[self.answer[rand_place_index - 1]][self.answer[rand_place_index]] + self.test_case[rand_place][5] * alpha_1 + self.t_displacement[self.answer[rand_place_index + 1]][self.answer[rand_place_index]] and self.test_case[place_to_override][2] <= current_time_2 + self.t_displacement[self.answer[rand_place_index-1]][self.answer[place_to_override_index]] and self.test_case[place_to_override][3] >= current_time_2 + self.t_displacement[self.answer[rand_place_index-1]][self.answer[place_to_override_index]] + self.t_displacement[self.answer[rand_place_index +1]][self.answer[place_to_override_index]] and self.test_case[rand_place][2] <= current_time_1 + self.t_displacement[self.answer[place_to_override_index-1]][self.answer[rand_place_index]] and self.test_case[rand_place][3] >= current_time_1 + self.t_displacement[self.answer[place_to_override_index-1]][self.answer[rand_place_index]] + self.t_displacement[self.answer[place_to_override_index +1]][self.answer[rand_place_index]]
+                        isproper = currently_available_time >= \
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][
+                                       self.answer[place_to_override_index]] + self.test_case[place_to_override][
+                                       5] * alpha_1 + self.t_displacement[self.answer[place_to_override_index + 1]][
+                                       self.answer[place_to_override_index]] + \
+                                   self.t_displacement[self.answer[rand_place_index - 1]][
+                                       self.answer[rand_place_index]] + self.test_case[rand_place][5] * alpha_1 + \
+                                   self.t_displacement[self.answer[rand_place_index + 1]][
+                                       self.answer[rand_place_index]] and self.test_case[place_to_override][
+                                       2] <= current_time_2 + self.t_displacement[self.answer[rand_place_index - 1]][
+                                       self.answer[place_to_override_index]] and self.test_case[place_to_override][
+                                       3] >= current_time_2 + self.t_displacement[self.answer[rand_place_index - 1]][
+                                       self.answer[place_to_override_index]] + \
+                                   self.t_displacement[self.answer[rand_place_index + 1]][
+                                       self.answer[place_to_override_index]] and self.test_case[rand_place][
+                                       2] <= current_time_1 + \
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][
+                                       self.answer[rand_place_index]] and self.test_case[rand_place][
+                                       3] >= current_time_1 + \
+                                   self.t_displacement[self.answer[place_to_override_index - 1]][
+                                       self.answer[rand_place_index]] + \
+                                   self.t_displacement[self.answer[place_to_override_index + 1]][
+                                       self.answer[rand_place_index]]
                     return isproper
 
                 if is_proper():
@@ -265,19 +326,24 @@ class Solution:
     def add_place_to_solution(self):
         unused_places = list(set(self.test_case.keys()) - set(self.answer))
         while len(unused_places) > 0:
-            [current_time, currently_available_time] = self.get_current_time(self.answer[len(self.answer)-1], self.all_available_time)
-            current_time += self.t_displacement[self.answer[len(self.answer)-2]][self.answer[len(self.answer)-1]] + \
-                            self.test_case[self.answer[len(self.answer)-1]][5] * self.alphas[len(self.answer)-1]
+            [current_time, currently_available_time] = self.get_current_time(self.answer[len(self.answer) - 1],
+                                                                             self.all_available_time)
+            current_time += self.t_displacement[self.answer[len(self.answer) - 2]][self.answer[len(self.answer) - 1]] + \
+                            self.test_case[self.answer[len(self.answer) - 1]][5] * self.alphas[len(self.answer) - 1]
             currently_available_time = self.all_available_time - current_time
 
             rand_place = random_choice(unused_places)
             unused_places.remove(rand_place)
             alpha = random()
 
-            if currently_available_time >= current_time + self.t_displacement[self.answer[len(self.answer)-1]][rand_place] + \
-                self.test_case[rand_place][5] * alpha and \
-                self.test_case[rand_place][2] <= current_time + self.t_displacement[self.answer[len(self.answer)-1]][rand_place] and \
-                self.test_case[rand_place][3] >= current_time + self.t_displacement[self.answer[len(self.answer)-1]][rand_place] + self.test_case[rand_place][5] * alpha:
+            if currently_available_time >= current_time + self.t_displacement[self.answer[len(self.answer) - 1]][
+                rand_place] + \
+                    self.test_case[rand_place][5] * alpha and \
+                    self.test_case[rand_place][2] <= current_time + \
+                    self.t_displacement[self.answer[len(self.answer) - 1]][rand_place] and \
+                    self.test_case[rand_place][3] >= current_time + \
+                    self.t_displacement[self.answer[len(self.answer) - 1]][rand_place] + self.test_case[rand_place][
+                5] * alpha:
                 self.answer.append(rand_place)
                 self.alphas.append(alpha)
                 self.count_satisfaction_points()
@@ -294,7 +360,7 @@ def count_t_displacement(test_case: dict, velocity: int) -> dict:
                 x_displacement = test_case[finish][0] - test_case[start][0]
                 y_displacement = test_case[finish][1] - test_case[start][1]
                 displacement = sqrt(pow(x_displacement, 2) + pow(y_displacement, 2))
-                t_displacement = int(displacement / velocity)
+                t_displacement = round(displacement / velocity)
                 temp_dict[finish] = t_displacement
         t_displacements[start] = temp_dict
 
@@ -305,6 +371,7 @@ class PlotSpIterations:
     def __init__(self, iterations, sp):
         self.sp: List[int] = sp
         self.iterations: List[int] = iterations
+        self.probability_data = []
 
     def add_data(self, iterations, sp):
         self.sp.append(sp)
@@ -312,3 +379,17 @@ class PlotSpIterations:
 
     def plot_data(self):
         plt.plot(self.iterations, self.sp)
+        plt.show()
+
+    def add_prob_data(self, temperature, probability):
+        self.probability_data.append([temperature, probability])
+
+    def data_to_xls(self):
+        df1 = DataFrame({
+            'SP': self.sp,
+            'iterations': self.iterations})
+        df2 = DataFrame({
+            'temperature': list(elem[0] for elem in self.probability_data),
+            'probability': list(elem[1] for elem in self.probability_data)})
+        df1.to_excel('../data/sp_data.xlsx', index=False)
+        df2.to_excel('../data/prob_data.xlsx', index=False)
