@@ -6,7 +6,7 @@ from typing import List
 
 from pandas import read_excel
 
-from src.solution import Solution, PlotSpIterations
+from src.solution import Solution, OutputData
 
 
 # test_case = {'Kraków': (22, 16, 0, 100, 3, 13), 'Warszawa': (27, 20, 0, 100, 5, 15), 'Lublin': (33, 19, 0, 100, 2, 10),
@@ -17,13 +17,13 @@ from src.solution import Solution, PlotSpIterations
 def import_testcase() -> dict:
     print('Enter filename to import:')
     filename = input()
-    df = read_excel('../testcases/' + filename + '.xlsx')
+    df = read_excel('./testcases/' + filename + '.xlsx')
     testcase = {str(df.index[i]): tuple(df.loc[i, :]) for i in range(df.index[-1] + 1)}
     return testcase
 
 
 def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
-              t_min: int, num_of_neig: int, len_of_sol: int, plot: PlotSpIterations) -> List[Solution]:
+              t_min: int, num_of_neig: int, len_of_sol: int, out_data: OutputData) -> List[Solution]:
     solution = Solution(test_case, velocity, available_time)
     current_solution = deepcopy(solution)
     best_solutions = []
@@ -54,12 +54,12 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
         if difference_of_energy > 0:
             current_solution = next_solution
             best_solutions.append(next_solution)
-            plot.add_data(temperature, current_solution.satisfaction_points)
+            out_data.add_data(temperature, current_solution.satisfaction_points)
 
         elif probability > random():
-            plot.add_prob_data(temperature, probability)
+            out_data.add_prob_data(temperature, probability)
             print('temperature: %5.2f  probability: %5.2f\n' % (temperature, probability))
-            plot.add_data(temperature, current_solution.satisfaction_points)
+            out_data.add_data(temperature, current_solution.satisfaction_points)
             current_solution = next_solution
 
         if len(best_solutions) >= len_of_sol:
@@ -70,14 +70,4 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
     return best_solutions
 
 
-test_case = import_testcase()
-plot = PlotSpIterations([], [])
-start = time.time()
-listen = algorithm(test_case, 1, 130, 1500, 1, 10, 10, plot)
-for i in listen:
-    print(i.answer)
-    print(i.satisfaction_points)
-plot.plot_data()
-end = time.time()
-print('\nexecution time: ' + str(end - start))
-plot.data_to_xls()
+

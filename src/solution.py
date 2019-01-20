@@ -3,6 +3,7 @@ from random import choice as random_choice
 from random import random
 from typing import List
 from pandas import DataFrame
+import numpy as np
 
 import matplotlib.pyplot as plt
 
@@ -367,19 +368,17 @@ def count_t_displacement(test_case: dict, velocity: int) -> dict:
     return t_displacements
 
 
-class PlotSpIterations:
+class OutputData:
     def __init__(self, iterations, sp):
         self.sp: List[int] = sp
         self.iterations: List[int] = iterations
         self.probability_data = []
+        #self.plot_data_in_init()
 
     def add_data(self, iterations, sp):
         self.sp.append(sp)
         self.iterations.append(iterations)
-
-    def plot_data(self):
-        plt.plot(self.iterations, self.sp)
-        plt.show()
+        #self.add_data_to_plot(iterations, sp)
 
     def add_prob_data(self, temperature, probability):
         self.probability_data.append([temperature, probability])
@@ -391,5 +390,25 @@ class PlotSpIterations:
         df2 = DataFrame({
             'temperature': list(elem[0] for elem in self.probability_data),
             'probability': list(elem[1] for elem in self.probability_data)})
-        df1.to_excel('../data/sp_data.xlsx', index=False)
-        df2.to_excel('../data/prob_data.xlsx', index=False)
+        df1.to_excel('./data/sp_data.xlsx', index=False)
+        df2.to_excel('./data/prob_data.xlsx', index=False)
+
+    def plot_data(self):
+        plt.plot(self.iterations, self.sp)
+        plt.show()
+
+    def plot_data_in_init(self):
+        plt.figure()
+        self.guess_plot, = plt.plot([], [], 'b-')
+        plt.xlabel('iter')
+        plt.ylabel('cost')
+        plt.draw()
+
+    def add_data_to_plot(self, iterations, sp):
+        self.guess_plot.set_xdata(np.append(self.guess_plot.get_xdata(), 1500 - iterations))
+        self.guess_plot.set_ydata(np.append(self.guess_plot.get_ydata(), sp))
+
+        plt.axis([min(self.guess_plot.get_xdata()), max(self.guess_plot.get_xdata()), min(self.guess_plot.get_ydata()),
+                  max(self.guess_plot.get_ydata()) + 5])
+
+        plt.pause(0.0001)
