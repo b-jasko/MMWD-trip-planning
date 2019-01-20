@@ -86,6 +86,12 @@ class TestPsIterations(unittest.TestCase):
         self.assertEqual(test.iterations, [1, 2, 3, 5])
         self.assertEqual(test.ps, [1, 2, 1, 7])
 
+class TestAlgorithm(unittest.TestCase):
+    def __init__(self):
+        solution = Solution(temp_test_case, 1, 100)
+        solution.answer = list(temp_test_case)
+        solution.alphas = [1, 1, 1]
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,7 @@
 @startuml
 start
-:Definiujemy temperaturę
-(maksymalną i minimalną)]
+:Definiujemy temperaturę (maksymalną i minimalną)
+   oraz współczynnik zmiany temperatury temp_ratio]
 :Generujemy pierwsze rozwiązanie]
 
 while(Główna pętla algorytmu) is (temp >= temp_min)
@@ -23,13 +23,11 @@ while(Główna pętla algorytmu) is (temp >= temp_min)
         else (nie)
         endif
     endif
-    :Temperatura - 1]
+    :temp * temp_ratio]
 endwhile (temp < temp_min)
 
 :Zwróć listę najlepszych rozwiązań]
 
 end
-
-
 
 @enduml

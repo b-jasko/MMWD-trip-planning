@@ -18,8 +18,10 @@ if __name__ == '__main__':
                        out_data=plot,
                        prob_ratio=10000)
     for i in listen:
-        print(i.answer)
-        print(i.satisfaction_points)
+        print('solution | alphas')
+        for ans, alph in zip(i.answer, i.alphas):
+            print('%8.0f | %8.2f' % (int(ans), alph))
+        print('\nSatisfaction points:' + str(i.satisfaction_points) + '\n\n')
     plot.plot_data()
     end = time.time()
     print('\nexecution time: ' + str(end - start))
