@@ -27,6 +27,7 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
     solution = Solution(test_case, velocity, available_time)
     current_solution = deepcopy(solution)
     best_solutions = []
+    tmp_sp = 0
 
     for temperature in range(t_max, t_min, -1):
         solution = deepcopy(current_solution)
@@ -55,12 +56,17 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
             current_solution = next_solution
             best_solutions.append(next_solution)
             out_data.add_data(temperature, current_solution.satisfaction_points)
+            tmp_sp = current_solution.satisfaction_points
 
         elif probability > random():
             out_data.add_prob_data(temperature, probability)
             print('temperature: %5.2f  probability: %5.2f\n' % (temperature, probability))
             out_data.add_data(temperature, current_solution.satisfaction_points)
             current_solution = next_solution
+            tmp_sp = current_solution.satisfaction_points
+
+        else:
+            out_data.add_data(temperature, tmp_sp)
 
         if len(best_solutions) >= len_of_sol:
             best_solutions.sort(key=lambda sol: sol.satisfaction_points)

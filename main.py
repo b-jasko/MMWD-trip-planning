@@ -1,5 +1,5 @@
 from src.algorithm import algorithm, import_testcase
-from src.solution import Solution, count_t_displacement, OutputData
+from src.solution import OutputData
 import time
 
 
