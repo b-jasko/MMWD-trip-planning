@@ -1,0 +1,35 @@
+@startuml
+start
+:Definiujemy temperaturę
+(maksymalną i minimalną)]
+:Generujemy pierwsze rozwiązanie]
+
+while(Główna pętla algorytmu) is (temp >= temp_min)
+
+    :Gernerujemy sąsiedztwo
+     aktualnego rozwiązania]
+    :Obliczamy difference_of_energy]
+
+    if (sąsiedztwo jest lepsze od rozwiązania
+        diffenence_of_energy > 0) then (tak)
+        :Zapisujemy sąsiedztwo jako rozwiązanie]
+        :Dodajemy aktualne rozwiązanie
+         do listy najlepszych rozwiązań]
+    else (nie)
+        :Losujemy w [0,1] liczbę rand
+         i obliczamy probability]
+        if(probability > rand) then (tak)
+            :Zapisujemy sąsiedztwo jako rozwiązanie]
+        else (nie)
+        endif
+    endif
+    :Temperatura - 1]
+endwhile (temp < temp_min)
+
+:Zwróć listę najlepszych rozwiązań]
+
+end
+
+
+
+@enduml

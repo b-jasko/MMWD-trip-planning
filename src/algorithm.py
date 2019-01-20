@@ -22,14 +22,15 @@ def import_testcase() -> dict:
     return testcase
 
 
-def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
-              t_min: int, num_of_neig: int, len_of_sol: int, out_data: OutputData) -> List[Solution]:
+def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int, t_min: int, temp_ratio: float,
+              num_of_neig: int, len_of_sol: int, out_data: OutputData, prob_ratio: float) -> List[Solution]:
     solution = Solution(test_case, velocity, available_time)
     current_solution = deepcopy(solution)
     best_solutions = []
     tmp_sp = 0
 
-    for temperature in range(t_max, t_min, -1):
+    temperature = t_max
+    while temperature >= t_min:
         solution = deepcopy(current_solution)
         temp_list = []
         for iterator in range(0, num_of_neig):
@@ -50,7 +51,7 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
         next_solution = deepcopy(solution)
 
         difference_of_energy = next_solution.satisfaction_points - current_solution.satisfaction_points
-        probability = exp(1000 * difference_of_energy / temperature)
+        probability = exp(prob_ratio * difference_of_energy / temperature)
 
         if difference_of_energy > 0:
             current_solution = next_solution
@@ -72,8 +73,8 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int,
             best_solutions.sort(key=lambda sol: sol.satisfaction_points)
             del best_solutions[0]
 
+        temperature = (temperature * temp_ratio)
+
     best_solutions.sort(key=lambda sol: sol.satisfaction_points)
     return best_solutions
-
-
 
