@@ -8,12 +8,12 @@ if __name__ == '__main__':
     data = OutputData([], [])
     start = time.time()
     list_of_best = algorithm(test_case=test_case,
-                             velocity=1,
-                             available_time=200,
+                             velocity=30,
+                             available_time=100,
                              t_max=15000,
                              t_min=100,
-                             temp_ratio=0.999,
-                             num_of_neig=100,
+                             temp_ratio=0.99,
+                             num_of_neig=20,
                              len_of_sol=10,
                              out_data=data,
                              prob_ratio=1000)

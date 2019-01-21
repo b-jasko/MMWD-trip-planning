@@ -81,6 +81,7 @@ def algorithm(test_case: dict,
 
         else:
             out_data.add_data(temperature, tmp_sp)
+            out_data.add_prob_data(temperature, probability)  #
 
         if len(best_solutions) >= len_of_sol:
             best_solutions.sort(key=lambda sol: sol.satisfaction_points)

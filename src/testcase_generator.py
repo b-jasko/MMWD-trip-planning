@@ -15,8 +15,8 @@ def generate_xls_testcase():
     PS = [randint(3, 20) for r in range(N)]
     t_maxPS = []
 
-    max_distance = 30
-    max_closing_time = 200
+    max_distance = 50
+    max_closing_time = 100
     places = []
     i = 0
 
