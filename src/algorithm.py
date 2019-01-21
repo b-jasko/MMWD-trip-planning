@@ -22,9 +22,19 @@ def import_testcase() -> dict:
     return testcase
 
 
-def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int, t_min: int, temp_ratio: float,
-              num_of_neig: int, len_of_sol: int, out_data: OutputData, prob_ratio: float) -> List[Solution]:
+def algorithm(test_case: dict,
+              velocity: int,
+              available_time: int,
+              t_max: int,
+              t_min: int,
+              temp_ratio: float,
+              num_of_neig: int,
+              len_of_sol: int,
+              out_data: OutputData,
+              prob_ratio: float) -> List[Solution]:
+    #solutions = []
     solution = Solution(test_case, velocity, available_time)
+    #solutions.append(solution)
     current_solution = deepcopy(solution)
     best_solutions = []
     tmp_sp = 0
@@ -35,7 +45,9 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int, t
         temp_list = []
         for iterator in range(0, num_of_neig):
             if_not_exist = Solution.neighborhood_of_solution(solution)
+            #solutions.append(solution)
             temp_list.append((deepcopy(solution), if_not_exist))
+            solution = deepcopy(current_solution)
             if if_not_exist:
                 break
         temp_list.sort(key=lambda sol: sol[0].satisfaction_points, reverse=True)
@@ -44,6 +56,7 @@ def algorithm(test_case: dict, velocity: int, available_time: int, t_max: int, t
 
         if if_not_exist:
             if_doesnt_work = Solution.neigh_if_few_test_cases(solution)
+            #solutions.append(solution)
             if if_doesnt_work:
                 best_solutions.append(current_solution)
                 break

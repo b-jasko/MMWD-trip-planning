@@ -275,10 +275,14 @@ def count_t_displacement(test_case: dict, velocity: int) -> dict:
 
 
 class OutputData:
-    def __init__(self, iterations, sp):
+    def __init__(self, iterations, sp,
+                 path1: str = './data/sp_data.xlsx',
+                 path2: str = './data/prob_data.xlsx'):
         self.sp: List[int] = sp
         self.iterations: List[int] = iterations
         self.probability_data = []
+        self.path_sp_data = path1
+        self.path_prob_data = path2
         #self.plot_data_in_init()
 
     def add_data(self, iterations, sp):
@@ -296,8 +300,8 @@ class OutputData:
         df2 = DataFrame({
             'temperature': list(elem[0] for elem in self.probability_data),
             'probability': list(elem[1] for elem in self.probability_data)})
-        df1.to_excel('./data/sp_data.xlsx', index=False)
-        df2.to_excel('./data/prob_data.xlsx', index=False)
+        df1.to_excel(self.path_sp_data, index=False)
+        df2.to_excel(self.path_prob_data, index=False)
 
     def plot_data(self):
         plt.plot(self.iterations, self.sp)

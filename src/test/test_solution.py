@@ -1,14 +1,18 @@
+import time
 import unittest
 
 from src.solution import Solution
 from src.solution import count_t_displacement
 from src.solution import OutputData
+from src.algorithm import algorithm
 
 temp_test_case = {'Kraków': (22, 15, 0, 100, 3, 13), 'Warszawa': (25, 15, 0, 100, 5, 15),
                   'Lublin': (27, 15, 0, 100, 2, 10)}
 
 temp_test_case_2 = {'Kraków': (22, 15, 0, 100, 3, 30), 'Warszawa': (25, 15, 0, 100, 5, 15),
                     'Lublin': (27, 15, 0, 100, 2, 20)}
+
+
 
 
 class TestSolution(unittest.TestCase):
@@ -22,7 +26,6 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(temp_test_case, solution.test_case)
 
     def test_count_satisfaction_points(self):
-
         solution = Solution(temp_test_case, 10, 100)
 
         solution.answer = list(temp_test_case)
@@ -85,12 +88,6 @@ class TestPsIterations(unittest.TestCase):
         test.add_data(5, 7)
         self.assertEqual(test.iterations, [1, 2, 3, 5])
         self.assertEqual(test.ps, [1, 2, 1, 7])
-
-class TestAlgorithm(unittest.TestCase):
-    def __init__(self):
-        solution = Solution(temp_test_case, 1, 100)
-        solution.answer = list(temp_test_case)
-        solution.alphas = [1, 1, 1]
 
 
 if __name__ == '__main__':
